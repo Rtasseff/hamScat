@@ -2,6 +2,8 @@
 __init__.py
 .DS_Store
 
+#vi stuff
+*.swp
 
 # C extensions
 *.so
