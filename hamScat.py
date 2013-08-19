@@ -106,7 +106,7 @@ def readBiMat(path,nRow):
 
 ### Scatter calculaitons and tests ###
 
-def empTestDS(D,tag,minPerm=100,maxPerm=1E8,stepPerm=100):
+def empTestDS(D,tagTmp,permList=[100,1E3,1E4,1E6]):
 	"""perform an empirical test on direct scatter.
 	Specifically we find the within and between class distances,
 	we calculate the ratio sb/sw and the calculate a one sided permutation test
@@ -117,21 +117,25 @@ def empTestDS(D,tag,minPerm=100,maxPerm=1E8,stepPerm=100):
 	tag	class labels as integers 0,..,K, n np int vector 
 	"""
 	# pre-process 
-	D,tag = pp(D,tag)
+	D,tag = pp(D,tagTmp)
 	
 	# get separation score
 	scat_b,scat_w,sep = calcDS(D,tag)
 
 	# calculate p via permutation 
 	# apply GPD when possible
-	nPerm = minPerm
 	p = np.nan
+	k = 0
+	kMax = len(permList)
 	while np.isnan(p):
-		if nPerm > maxPerm: break
+		if k == kMax:
+			p = 10./permList[-1] 
+			break
+		nPerm=int(permList[k])
 		null_sep = permuteSep(D,tag,nPerm)
 		p = gpdPerm.est(sep,null_sep)
 		if p == 0: p = np.nan
-		nPerm = nPerm * stepPerm
+		k = k+1
 
 	return(p)
 
@@ -210,6 +214,29 @@ def rTestDS(D,tag):
 
 	return(p)
 
+
+def rTestMS(D,tag):
+	"""This is a custom method for a specific analysis
+	in which we get the mean scatter of D 
+	and test if tag==1 > tag==0 in terms of a 
+	ranked sum test
+	Only use this for the ptb binary label.
+	"""
+	newTag = np.array(np.zeros(len(tag)),dtype=int)
+	newTag[tag=='TRUE'] = 1
+	D,tag = pp(D,tag)
+	meanScat = calcMeanScat(D)
+	# because the preproc (pp) does not 
+	# care about the values we have to be careful
+	# we are 
+	x = meanScat[newTag==1]
+	y = meanScat[newTag==0]
+	p1s,_ = statsUtil.rankSum1S(x,y)
+	p2s,_ = statsUtil.rankSum(x,y)
+
+	return(p1s,p2s)
+
+
 def rTestMS_cust(D,tag):
 	"""This is a custom method for a specific analysis
 	in which we get the mean scatter of D 
@@ -231,19 +258,46 @@ def rTestMS_cust(D,tag):
 
 	return(p1s,p2s,meanScat)
 
+def rTestMS_cust1(D,tag):
+	"""This is a custom method for a specific analysis
+	in which we get the mean scatter of D 
+	and test if tag==1 > tag==0 in terms of a 
+	ranked sum test
+	Only use this for the ptb binary label.
+	"""
+	newTag = np.array(np.zeros(len(tag)),dtype=int)
+	newTag[tag=='TRUE'] = 1
+	D,tag = pp(D,tag)
+	meanScat = calcMeanScat(D)
+	# because the preproc (pp) does not 
+	# care about the values we have to be careful
+	# we are 
+	x = meanScat[newTag==1]
+	y = meanScat[newTag==0]
+	p1s,_ = statsUtil.rankSum1S(x,y)
+	p2s,_ = statsUtil.rankSum(x,y)
+
+	return(p1s,p2s)
+
 
 def pp(D,tag):
 	"""pre process data by checking the distance matrix
 	and converting tags to ints
+	Also removes missing 'nan' values
 	"""
 	if not D[0,0]<1E-52 or not np.abs(D[1,0]-D[0,1])<1E-52:
 		D = D.T+D
 		if not D[0,0]<1E-52 or not np.abs(D[1,0]-D[0,1])<1E-52:
 			raise ValueError('Distance Matrix not correct')
-	
-	tag,_ = statsUtil.cat2int(tag)
 
-	return(D,tag)
+	# remove nan values
+	missInd = np.array(tag)=='nan'
+	tagNew = tag[~missInd]
+
+	
+	tagNew,_ = statsUtil.cat2int(tagNew)
+
+	return(D[~missInd][:,~missInd],tagNew)
 
 
 def sepScat(D,tag):
@@ -286,3 +340,62 @@ def calcMeanScat(D):
 	meanScat = sumD/(n-1)
 	return(meanScat)
 
+
+## burden tests and feaure generation
+# all code here assumes BINARY features!!!!!
+# all code here assumes 2 copies, diploid!!!!!
+
+def getMA(x):
+	"""Find the minor allele from the genomic vector x
+	assumes binary with 0 as missing, so 1, or 2.
+	"""
+	ma = 2
+	if np.sum(x==2)>np.sum(x==1): ma=1
+	return(ma)
+
+def calcHHRef(X):
+	"""Calcualte a catigorical variable
+	0 1 2, if there is a heterozygous non ref
+	allele, 1, or a homozygous non ref allele,2,
+	anywhere in the passed region, X 
+	(an int geomic vector).
+	FOr binary variants this is similar to 
+	minor allele (just on occasion 0 and 2 may be switched 
+	for a classifier that has no concept of 0 and 2 this is
+	a non issue."""
+	# merge the columns into one number per sample per varriant 
+	# copy merge .
+	Xmerg = X[:,::2] + X[:,1::2]
+	# assuming binary and 0 = missing we know the following:
+	hhrScore = np.max(Xmerg,0)
+	hhrScore[hhrScore<3] = 0
+	hhrScore[hhrScore==3] = 1
+	hhrScore[hhrScore==4] = 2
+	return hhrScore
+
+def calcSumMA(X):
+	"""returns a vector which contains the 
+	sum of minor alleles for each sample over the 
+	region defined by X (int genomic matrix).
+	"""
+	# this does not generally assume binary/ however getMA does 
+
+	# two copies for each sample
+	if X.ndim==2:
+		n,m=X.shape
+		nSamp = m/2
+		# init vector 
+		sumMA = np.zeros(nSamp,dtype=int)
+		# loop through variants
+		for i in range(n):
+			ma = getMA(X[i])
+			sumMA = sumMA + np.array(X[i,::2]==ma,dtype='int8') # check the first copy
+			sumMA = sumMA + np.array(X[i,1::2]==ma,dtype='int8') # check the second copy 
+	elif X.ndim==1:
+		nSamp = len(X)/2
+		sumMA = np.zeros(nSamp,dtype=int)
+		ma = getMA(X)
+		sumMA = sumMA + np.array(X[::2]==ma,dtype='int8') # check the first copy
+		sumMA = sumMA + np.array(X[1::2]==ma,dtype='int8') # check the second copy
+	
+	return(sumMA)
