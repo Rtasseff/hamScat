@@ -25,13 +25,13 @@ Contents Summary
 ------------------
 note the terms scat or hamScat signify the main purpose, calculation of hamming scatter separability, while the term FM signifies extra code written to generate feature matrices without using sample meta data.
 
-CreatJobList\_\*.py	scripts to create the appropriate golem job list 
-getSampleMeta.py	project specific file to gather the appropriate meta data
-hamScat.py		main code for running the tests, includes functions to run the tests, calculate hamming distance and open appropriate binary variant region files.
-parse\_\*\_MP.py	parses the resulting output from golem into an easy to read tsv file which is ordered and checked for errors
-run\_\*\_MP.py		code called by golem to run the appropriate functions
-sampleMeta\_selectFeature.dat	listing of features in the sample meta data (specific to project) and can be used to select features for testing
-statsUtil.py		python functions for some statistical utilities
+CreatJobList\_\*.py	scripts to create the appropriate golem job list    
+getSampleMeta.py	project specific file to gather the appropriate meta data   
+hamScat.py		main code for running the tests, includes functions to run the tests, calculate hamming distance and open appropriate binary variant region files.    
+parse\_\*\_MP.py	parses the resulting output from golem into an easy to read tsv file which is ordered and checked for errors    
+run\_\*\_MP.py		code called by golem to run the appropriate functions    
+sampleMeta\_selectFeature.dat	listing of features in the sample meta data (specific to project) and can be used to select features for testing   
+statsUtil.py		python functions for some statistical utilities   
 
 
 Dependencies
