@@ -1,6 +1,6 @@
 import numpy as np
 
-FM = 'sumMA'
+FM = 'MINA'
 inDir = '/titan/cancerregulome9/ITMI_PTB/users/rtasseff/runMP'
 outDir ='/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/PPC'
 inName = '3193e0a3e9b3ec9645f7b35f15c09a7a.out.txt'
@@ -13,8 +13,6 @@ pathOut = outDir+'/'+outName
 sampMetaPath = outDir+'/'+sampMetaName
 sampMeta = np.loadtxt(sampMetaPath,dtype=str)
 
-dataType = 'N'
-if FM=='HHRef':dataType = 'C'
 
 
 memberList = ['M','F','NB']
@@ -46,13 +44,15 @@ fin = open(pathIn)
 for line in fin:
 	data = line.rstrip().lstrip().split('\t')
 	tsID = data[0]
+	if tsID.find(FM) <0:
+		raise ValueError('Feature type '+tsID+' found, expected '+FM'.')
 	data = np.array(data[1:])
 	j = 0
 	for member in memberList:
 		keepInd = sampMeta[:,1]==member	
 		tmpData = data[keepInd]
 
-		foutFM[j].write(dataType+':IGVR:'+tsID+'_'+FM+':'+member+'::::'+info)
+		foutFM[j].write(tsID+':'+member+'::::'+info)
 		for i in range(len(tmpData)):
 			foutFM[j].write('\t'+tmpData[i])
 
