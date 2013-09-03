@@ -1,10 +1,10 @@
 import numpy as np
 
-FM = 'MINA'
+FM = 'HMST'
 #inDir = '/titan/cancerregulome9/ITMI_PTB/users/rtasseff/runMP'
 inDir = '/titan/cancerregulome9/workspaces/golems/master'
 outDir ='/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/miRNA'
-inName = 'f7356721bd845ac31b7b473caf455033.out.txt'
+inName = '71c9744ac681ec94233b57358d4dc25a.out.txt'
 outName = 'results/DF4_2_miRNA_20130903'
 sampMetaName = 'sampleMeta.dat'
 info = 'miRNA'
@@ -59,8 +59,8 @@ for line in fin:
 
 		foutFM[j].write('\n')
 		j = j+1
-	
-	
+
+
 	
 
 foutFM[0].close()
