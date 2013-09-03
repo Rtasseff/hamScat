@@ -21,30 +21,31 @@ tagPath = sys.argv[4]
 
 
 # break out meta data into tags for given family member
-tag = np.loadtxt(tagPath,dtype=str)
+tag = np.loadtxt(tagPath,dtype=str)[1:]
 
 meanScat = np.zeros(len(tag))
 
+if nVar > 1:
+	for memb in ['M','F','NB']:
+		membInd = tag[:,1] == memb
 
-for memb in ['M','F','NB']:
-	membInd = tag[:,1] == memb
 
+		# get X from bianary matrix
+		X = hamScat.readBiMat(matPath,nVar)
+		#recall X is twice the size, 2 entries for each sample
+		membIndX = np.zeros(2*len(membInd),dtype=bool)
+		membIndX[::2]= membInd
+		membIndX[1::2]= membInd
 
-	# get X from bianary matrix
-	X = hamScat.readBiMat(matPath,nVar)
-	#recall X is twice the size, 2 entries for each sample
-	membIndX = np.zeros(2*len(membInd),dtype=bool)
-	membIndX[::2]= membInd
-	membIndX[1::2]= membInd
+		# get only the ones for our current member
+		X = X[:,membIndX]
 
-	# get only the ones for our current member
-	X = X[:,membIndX]
+		# get distances
+		D = hamScat.calcNHDMat(X)
 
-	# get distances
-	D = hamScat.calcNHDMat(X)
-
-	meanScat[membInd] = hamScat.calcMeanScat(D)
-
+		meanScat[membInd] = hamScat.calcMeanScat(D)
+else:
+	meanScat = meanScat*np.nan	
 
 
 
