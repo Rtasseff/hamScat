@@ -50,7 +50,7 @@ for memb in ['M','F','NB']:
 
 
 # print to std out for golem to catch 
-out = transID
+out = 'N:HMST:'+transID
 for i in range(len(meanScat)):
 	out = '%s\t%05.4E' % (out,meanScat[i])
 out = out+'\n'
