@@ -6,7 +6,7 @@ outDir ='/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/PPC'
 inName = '3193e0a3e9b3ec9645f7b35f15c09a7a.out.txt'
 outName = 'results/DF4_2_test_20130628'
 sampMetaName = 'sampleMeta.dat'
-info = 'PPC'
+info = 'miRNA'
 
 pathIn = inDir+'/'+inName
 pathOut = outDir+'/'+outName
