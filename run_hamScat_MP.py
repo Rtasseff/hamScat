@@ -43,33 +43,43 @@ out = '>>\t'+transID
 membList = ['F','M','NB']
 for memb in membList:
 
-	# break out meta data into tags for given family member
-	membInd = tag[:,1] == memb
+	if nVar>1:
+
+		# break out meta data into tags for given family member
+		membInd = tag[:,1] == memb
 
 
 
-	# get X from bianary matrix
-	X = hamScat.readBiMat(matPath,nVar)
-	#recall X is twice the size, 2 entries for each sample
-	membIndX = np.zeros(2*len(membInd),dtype=bool)
-	membIndX[::2]= membInd
-	membIndX[1::2]= membInd
+		# get X from bianary matrix
+		X = hamScat.readBiMat(matPath,nVar)
+		#recall X is twice the size, 2 entries for each sample
+		membIndX = np.zeros(2*len(membInd),dtype=bool)
+		membIndX[::2]= membInd
+		membIndX[1::2]= membInd
 
-	X = X[:,membIndX]
-	# get distances
-	D = hamScat.calcNHDMat(X)
-	
-	# run tests
-	for i in range(len(featInd)):
-		ind = featInd[i]
-		label = 'HSSEP|'+selFeat[ind,0]+'|'+memb
-		p = hamScat.empTestDS(D,tag[:,ind][tag[:,1] == memb],permList=[100,1E3,1E4,1E5,1E6])
-		out = '%s\t%s\t%05.4E'%(out,label,p)
+		X = X[:,membIndX]
+		# get distances
+		D = hamScat.calcNHDMat(X)
+		
+		# run tests
+		for i in range(len(featInd)):
+			ind = featInd[i]
+			label = 'HSSEP|'+selFeat[ind,0]+'|'+memb
+			p = hamScat.empTestDS(D,tag[:,ind][tag[:,1] == memb],permList=[100,1E3,1E4,1E5,1E6])
+			out = '%s\t%s\t%05.4E'%(out,label,p)
 
 
-	# special one, diffrent algo, similar to tests on HMST
-	#p1sPM,p2sPM = hamScat.rTestMS_cust1(D,tag[:,5])
-	#out = '%s\t%s\t%05.4E\t%s\t%05.4E'%(out,'RMHMST1|B:CLIN:Preterm|'+memb,p1sPM,'RMHMST2|B:CLIN:Preterm|'+memb,p2sPM)
+		# special one, diffrent algo, similar to tests on HMST
+		#p1sPM,p2sPM = hamScat.rTestMS_cust1(D,tag[:,5])
+		#out = '%s\t%s\t%05.4E\t%s\t%05.4E'%(out,'RMHMST1|B:CLIN:Preterm|'+memb,p1sPM,'RMHMST2|B:CLIN:Preterm|'+memb,p2sPM)
+
+	else:
+		for i in range(len(featInd)):
+			ind = featInd[i]
+			label = 'HSSEP|'+selFeat[ind,0]+'|'+memb
+			out = out+'\t'+label+'\tnan'
+
+		
 
 
 
