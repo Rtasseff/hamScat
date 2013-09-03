@@ -17,18 +17,27 @@ matPath = sys.argv[2]
 # number of variants in transcript data matrix
 nVar = int(sys.argv[3])
 
-# get X from bianary matrix
-X = hamScat.readBiMat(matPath,nVar)
-
-
-sumMA = hamScat.calcSumMA(X)
-
-
-# print to std out for golem to catch 
 out = 'N:MINA:'+transID
-for i in range(len(sumMA)):
-	out = '%s\t%05.4E' % (out,sumMA[i]) 
-out = out+'\n'
+
+if nVar>1:
+
+	# get X from bianary matrix
+	X = hamScat.readBiMat(matPath,nVar)
+
+
+	sumMA = hamScat.calcSumMA(X)
+
+
+	# print to std out for golem to catch 
+	out = 'N:MINA:'+transID
+	for i in range(len(sumMA)):
+		out = '%s\t%05.4E' % (out,sumMA[i]) 
+	out = out+'\n'
+else:
+	X = hamScat.readBiMat(matPath,nVar)
+	for i in range(len(X)):
+		out = 'out\tnan'
+	out = out+'\n'		
 
 print out
 
