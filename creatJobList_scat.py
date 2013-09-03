@@ -1,12 +1,12 @@
 import numpy as np
 
-label = 'DF4_2_hamScat_addFeat_20130816_test'
+label = 'DF4_2_miRNA_hamScat_20130830'
 myPath = '/titan/cancerregulome9/ITMI_PTB/users/rtasseff/runMP'
-dataPath = '/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/PPC'
+dataPath = '/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/miRNA'
 tagPath = dataPath+'/sampleMeta.dat'
 #tmpInd = [2,4,7]
 index = np.loadtxt(dataPath+'/index.tab',dtype=str)#[tmpInd]
-selFeatPath = myPath+'/sampleMeta_selectFeature_test.dat'
+selFeatPath = dataPath+'/sampleMeta_selectFeature.dat'
 
 f=open('golemJobList_'+label+'.txt','w')
 
