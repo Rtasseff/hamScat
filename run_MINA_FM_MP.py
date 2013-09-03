@@ -25,7 +25,7 @@ sumMA = hamScat.calcSumMA(X)
 
 
 # print to std out for golem to catch 
-out = transID
+out = 'N:MINA:'+transID
 for i in range(len(sumMA)):
 	out = '%s\t%05.4E' % (out,sumMA[i]) 
 out = out+'\n'
