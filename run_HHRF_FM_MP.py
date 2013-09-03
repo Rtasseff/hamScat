@@ -15,6 +15,14 @@ transID = sys.argv[1]
 matPath = sys.argv[2]
 # number of variants in transcript data matrix
 nVar = int(sys.argv[3])
+# path to the tag infromation, sample meta data
+tagPath = sys.argv[4]
+
+
+
+# break out meta data into tags for given family member
+tag = np.loadtxt(tagPath,dtype=str)[1:]
+m = len(tag)
 
 out = 'B:HHRF:'+transID
 
@@ -32,10 +40,9 @@ if nVar>1:
 		out = '%s\t%05.4E' % (out,hhrScore[i])
 	out = out+'\n'
 else:
-	X = hamScat.readBiMat(matPath,nVar)
-	for i in range(len(X)):
-		out = 'out\tnan'
-	out = out+'\n'		
+	for i in range(m):
+		out = out+'\tnan'
+	out = out+'\n'			
 
 
 print out
