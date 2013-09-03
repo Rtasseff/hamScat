@@ -24,7 +24,7 @@ hhrScore = hamScat.calcHHRef(X)
 
 
 # print to std out for golem to catch 
-out = transID
+out = 'B:HHRF:'+transID
 for i in range(len(hhrScore)):
 	out = '%s\t%05.4E' % (out,hhrScore[i])
 out = out+'\n'
