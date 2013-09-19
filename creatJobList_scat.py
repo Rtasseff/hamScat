@@ -1,8 +1,8 @@
 import numpy as np
 
-label = 'DF4_2_miRNA_hamScat_20130830'
+label = 'DF4_2_PPC_hamScat_20130919'
 myPath = '/titan/cancerregulome9/ITMI_PTB/users/rtasseff/runMP'
-dataPath = '/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/miRNA'
+dataPath = '/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/PPC'
 tagPath = dataPath+'/sampleMeta.dat'
 #tmpInd = [2,4,7]
 index = np.loadtxt(dataPath+'/index.tab',dtype=str)#[tmpInd]
