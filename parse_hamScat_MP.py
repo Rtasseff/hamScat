@@ -1,11 +1,11 @@
 import numpy as np
 
 
-inName = 'f75736c0e604deaf3b8f491bcf6e86f6.out.txt'
-outName = 'results/DF4_2_additional_20130819'
+inName = '990dac656c292d7960f36aa293621157.out.txt'
+outName = 'results/DF4_2_miRNA_20130905'
 
 inDir = '/titan/cancerregulome9/workspaces/golems/master'
-outDir ='/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/PPC'
+outDir ='/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/miRNA'
 sampMetaName = 'sampleMeta.dat'
 indexName = 'index.tab'
 
