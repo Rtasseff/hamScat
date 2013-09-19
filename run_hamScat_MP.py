@@ -65,8 +65,8 @@ for memb in membList:
 		for i in range(len(featInd)):
 			ind = featInd[i]
 			label = 'HSSEP|'+selFeat[ind,0]+'|'+memb
-			p = hamScat.empTestDS(D,tag[:,ind][tag[:,1] == memb],permList=[100,1E3,1E4,1E5,1E6])
-			out = '%s\t%s\t%05.4E'%(out,label,p)
+			p,sep = hamScat.empTestDS(D,tag[:,ind][tag[:,1] == memb],permList=[100,1E3,1E4,1E5,1E6])
+			out = '%s\t%s\t%05.4E\t%05.4E'%(out,label,p,sep)
 
 
 		# special one, diffrent algo, similar to tests on HMST
@@ -77,7 +77,7 @@ for memb in membList:
 		for i in range(len(featInd)):
 			ind = featInd[i]
 			label = 'HSSEP|'+selFeat[ind,0]+'|'+memb
-			out = out+'\t'+label+'\tnan'
+			out = out+'\t'+label+'\tnan\tnan'
 
 		
 
