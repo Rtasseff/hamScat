@@ -137,7 +137,7 @@ def empTestDS(D,tagTmp,permList=[100,1E3,1E4,1E6]):
 		if p == 0: p = np.nan
 		k = k+1
 
-	return(p)
+	return(p,sep)
 
 def permuteSep(D,tag,nSamp=1000,v=False):
 	"""Calculate the null distribution
