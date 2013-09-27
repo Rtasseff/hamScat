@@ -1,11 +1,11 @@
 import numpy as np
 
 
-inName = '990dac656c292d7960f36aa293621157.out.txt'
-outName = 'results/DF4_2_miRNA_20130905'
+inName = '7d94fc54cf1c4338d907ac67285df451.out.txt'
+outName = 'results/tmp_HSSEP'
 
 inDir = '/titan/cancerregulome9/workspaces/golems/master'
-outDir ='/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/miRNA'
+outDir ='/titan/cancerregulome9/ITMI_PTB/users/rtasseff/DF4/DF4_2/PPC'
 sampMetaName = 'sampleMeta.dat'
 indexName = 'index.tab'
 
@@ -80,7 +80,7 @@ for i in range(nNames):
 	out = tsID
 	outSep = tsID
 	for j in range(m):
-		if repDataP[i,j] < 0 or np.isnan(repDataP[i,j]) or np.isnan(repDataP[i,j]): 
+		if repDataP[i,j] < 0 or np.isnan(repDataP[i,j]) or np.isnan(repDataS[i,j]): 
 			out = out+'\tnan'
 			outSep = outSep+'\tnan'
 		else: 
