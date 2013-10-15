@@ -17,9 +17,7 @@ def _hamDist(gen_i,gen_j):
 	return(dist)
 
 def calcHD(gen_i,gen_j):
-	""" find genetic distance between 2 varriants
-	assume single digit identifiers seperated by 
-	a single character sep ie 0/1 or 0|1.
+	""" find genetic distance between 2 varriants.
 	"""
 	gen_i1 = gen_i[0]
 	gen_i2 = gen_i[1]
@@ -35,7 +33,7 @@ def calcHD(gen_i,gen_j):
 
 
 # calc the normalized hamming dist matrix
-def calcNHDMat(X):
+def calcNHDMat(X,countMiss=True):
 	"""calculat the the normalized hamming distance matrix
 	This is specific to the genotype matrices.
 	Currently we assume that each row is a variant
@@ -44,6 +42,11 @@ def calcNHDMat(X):
 	Assuming integers
 	Missing data is a zero 
 	Comparisions with any missing data are ignored.
+	coutMiss	if true - count missing in normalization,
+			but unable to calc dif so equivlant to
+			setting as no observed dif
+			else - ignore and do not calc dif and
+			do not count in normalization
 	"""
 	if X.ndim==2:
 		nVar,m = X.shape
@@ -57,6 +60,11 @@ def calcNHDMat(X):
 	# initialize matrices
 	HD = np.zeros((nSamp,nSamp),dtype= 'i')
 	N = np.zeros((nSamp,nSamp),dtype= 'i')
+	if countMiss:
+		# counting all calls, even missing, in normalization
+		N = N+nVar*2
+	# if not add only when non missing comparison is made, elsewhere
+	
 	# loop through all variants
 	for k in range(nVar):
 		# loop through all samples
@@ -71,7 +79,7 @@ def calcNHDMat(X):
 						gen_j = (X[k,j],X[k,j+1])
 						dist = calcHD(gen_i,gen_j)
 						HD[_i,_j] = HD[_i,_j]+dist
-						N[_i,_j] =  N[_i,_j]+2
+						if not countMiss: N[_i,_j] =  N[_i,_j]+2
 	N = N+1E-32
 	NHD = HD/N
 	NHD = NHD + NHD.T
@@ -106,7 +114,7 @@ def readBiMat(path,nRow):
 
 ### Scatter calculaitons and tests ###
 
-def empTestDS(D,tagTmp,permList=[100,1E3,1E4,1E6]):
+def empTestDS(D,tagTmp,permList=[100,1E4,1E6]):
 	"""perform an empirical test on direct scatter.
 	Specifically we find the within and between class distances,
 	we calculate the ratio sb/sw and the calculate a one sided permutation test
@@ -115,7 +123,9 @@ def empTestDS(D,tagTmp,permList=[100,1E3,1E4,1E6]):
 	GPDPerm used when possible to improve estimate.
 	D	distance matrix, nxn np array
 	tag	class labels as integers 0,..,K, n np int vector 
+	permList	list of permutations to be used in order (highest last)
 	"""
+	minExc = 10
 	# pre-process 
 	D,tag = pp(D,tagTmp)
 	
@@ -126,16 +136,21 @@ def empTestDS(D,tagTmp,permList=[100,1E3,1E4,1E6]):
 	# apply GPD when possible
 	p = np.nan
 	k = 0
-	kMax = len(permList)
-	while np.isnan(p):
-		if k == kMax:
-			p = 10./permList[-1] 
-			break
-		nPerm=int(permList[k])
+	for nPerm in permList:
+		nPerm = int(nPerm)
 		null_sep = permuteSep(D,tag,nPerm)
-		p = gpdPerm.est(sep,null_sep)
+		# estimate without GDP if possible
+		nExc = np.sum(sep<=null_sep)
+		if nExc >= minExc: p = float(nExc)/nPerm
+		elif not np.isinf(sep): p = gpdPerm.est(sep,null_sep)
 		if p == 0: p = np.nan
-		k = k+1
+		if not np.isnan(p): break
+	# check to see if still not set
+	if np.isnan(p):
+		# not enough perms, est best possible
+		# note that if p was worse, it would have been set already
+		p = 10./permList[-1]
+
 
 	return(p,sep)
 
@@ -283,6 +298,7 @@ def rTestMS_cust1(D,tag):
 def pp(D,tag):
 	"""pre process data by checking the distance matrix
 	and converting tags to ints
+	Tag must be an array of strings
 	Also removes missing 'nan' values
 	"""
 	if not D[0,0]<1E-52 or not np.abs(D[1,0]-D[0,1])<1E-52:
@@ -291,7 +307,10 @@ def pp(D,tag):
 			raise ValueError('Distance Matrix not correct')
 
 	# remove nan values
-	missInd = np.array(tag)=='nan'
+	# needs to be np array
+	tag = np.array(tag,dtype=str) # if already np, this does nothing
+	# assuming string so look for 'nan' NOT np.nan
+	missInd = tag=='nan'
 	tagNew = tag[~missInd]
 
 	
